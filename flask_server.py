@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 import sqlite3
 from waitress import serve
 import gpt4
-import testcv
+import take_pic
 import run_hume
 
 app = Flask(__name__)
@@ -68,7 +68,7 @@ def initialize_responses_database():
                     )''')
 
     # Assign the string as the value of the first gpt4_response key
-    init_prompt = "You are a choose your adventure game in the Game of Thrones universe. Your name is X. You will have certain interactions with other characters in the Game of Thrones universe and will either kill, or otherwise leave them to die, or spare, or aid them. Set the scene for an intro to this game. Then, generate a beginning scenario that can be reacted to by the word Affirmative or Negative. Wait for the user's response, which will either be affirmative or negative only. Then, you will print out the result of the user's actions. reply and specify the loss numerically to yourself only from 0 - 20 in health, food, and water or gain with Loss: or Gain in one line separated by commas for each category loss/gain and omit any categories unaffected by loss/gain. For example, Loss: -5 health, -10 food, -15 water or Gain: 5 health, 10 health, 15 water."
+    init_prompt = "You are a choose your adventure game in the Game of Thrones universe. Your name is X. You will have certain interactions with other characters in the Game of Thrones universe and will either kill, or otherwise leave them to die, or spare, or aid them. Set the scene for an intro to this game. Then, generate a beginning scenario that can be reacted to with a positive or negative action. Wait for the user's response, which will be a list of six emotions. If 3 or more of the emotions are positive, then make the user do something positive. If 3 or more of the emotions are negative, make the user do something negative. Then, you will print out the result of the user's actions and reply and specify the loss numerically to yourself only from 0 - 20 in health, food, and water or gain with Loss: or Gain in one line separated by commas for each category loss/gain and omit any categories unaffected by loss/gain. For example, Loss: -5 health, -10 food, -15 water or Gain: 5 health, 10 health, 15 water."
     cursor.execute('''INSERT INTO user_responses (user_emotion) VALUES (?)''', ("{}".format(init_prompt),))
 
     gpt4_response = gpt4.gpt4_call(init_prompt)
@@ -128,7 +128,7 @@ def get_stats_values():
 
     return jsonify(stats_values)
 
-@app.route('/inputExpression', methods=['GETT'])
+@app.route('/inputExpression', methods=['GET'])
 def run_gpt4():
     user_emotion = take_and_process_picture()
     
@@ -171,8 +171,8 @@ def run_gpt4():
     return jsonify({'gpt4_response': gpt4_response})
 
 def take_and_process_picture():
-    testcv.take_pic()
-    detected_sentiment = run_hume.detect_sentiment("captured_image.png")
+    take_pic.snap()
+    detected_sentiment = run_hume.detect_sentiment()
     
     return detected_sentiment
 

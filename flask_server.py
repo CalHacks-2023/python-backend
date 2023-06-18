@@ -5,6 +5,7 @@ import gpt4
 import take_pic
 import run_hume
 import asyncio
+import openai
 
 app = Flask(__name__)
 
@@ -69,7 +70,7 @@ def initialize_responses_database():
                     )''')
 
     # Assign the string as the value of the first gpt4_response key
-    init_prompt = "You are a choose your adventure game in the Game of Thrones universe. Your name is X. You will have certain interactions with other characters in the Game of Thrones universe and will either kill, or otherwise leave them to die, or spare, or aid them. Set the scene for an intro to this game. Then, generate a beginning scenario that can be reacted to with a positive or negative action. Wait for the user's response, which will be a list of six emotions. If 3 or more of the emotions are positive, then make the user do something positive. If 3 or more of the emotions are negative, make the user do something negative. Then, you will print out the result of the user's actions and reply and specify the loss numerically to yourself only from 0 - 20 in health, food, and water or gain with Loss: or Gain in one line separated by commas for each category loss/gain and omit any categories unaffected by loss/gain. For example, Loss: -5 health, -10 food, -15 water or Gain: 5 health, 10 health, 15 water."
+    init_prompt = "You are a choose your adventure game in the Game of Thrones universe. Your name is X. You will have certain interactions with other characters in the Game of Thrones universe and will either kill, or otherwise leave them to die, or spare, or aid them. Set the scene for an intro to this game. Then, generate a beginning scenario that can be reacted to with a positive or negative action. Wait for the user's response, which will be a list of six emotions. If 3 or more of the emotions are positive, then make the user do something positive. If 3 or more of the emotions are negative, make the user do something negative. Then, you will print out the result of the user's actions and reply and specify the loss numerically to yourself only from 0 - 20 in health, food, and water or gain with Loss: or Gain in one line separated by commas for each category loss/gain. For example, Loss: -5 health, -10 food, -15 water or Gain: 5 health, 10 food, 15 water."
     cursor.execute('''INSERT INTO user_responses (user_emotion) VALUES (?)''', ("{}".format(init_prompt),))
 
     gpt4_response = gpt4.gpt4_call(init_prompt)
@@ -78,6 +79,22 @@ def initialize_responses_database():
     cursor.execute('INSERT INTO gpt4_responses (gpt4_response) VALUES (?)', (gpt4_response,))
 
     conn.commit()
+    conn.close()
+
+def change_char_values(health_change, water_change, food_change):
+    conn = sqlite3.connect('charValues.db')
+    cursor = conn.cursor()
+
+    cursor.execute("UPDATE char_values SET value = value + ? WHERE name = 'health'", (health_change,))
+
+    cursor.execute("UPDATE char_values SET value = value + ? WHERE name = 'food'", (water_change,))
+
+    cursor.execute("UPDATE char_values SET value = value + ? WHERE name = 'water'", (food_change,))
+
+    # Commit the changes
+    conn.commit()
+
+    # Close the database connection
     conn.close()
 
 @app.route('/characterInit', methods=['POST'])
@@ -129,6 +146,24 @@ def get_stats_values():
 
     return jsonify(stats_values)
 
+@app.route('/generateSprite', methods=['GET'])
+def generate_image():
+    openai.api_key = "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"
+
+    # The text prompt you want to use to generate an image
+    prompt = "Brave fighting cartoon character in desert"
+
+    # Generate an image
+    response = openai.Image.create(
+        prompt=prompt,
+        model="image-alpha-001",
+        size="1024x1024",
+        response_format="url"
+    )
+
+    # Print the URL of the generated image
+    return jsonify({'img_url': response["data"][0]["url"]})
+
 @app.route('/inputExpression', methods=['GET'])
 def run_gpt4():
     take_pic.snap()
@@ -154,11 +189,9 @@ def run_gpt4():
     max_rows = max(len(user_rows), len(gpt4_rows))
     for i in range(max_rows):
         if i < len(gpt4_rows):
-            print("TEST" + gpt4_rows[i][0])
             user_gpt4_responses += gpt4_rows[i][0]
         if i < len(user_rows):
             user_gpt4_responses += user_rows[i][0]
-            print("TEST" + user_rows[i][0])
 
     # Call the GPT-4 function with the concatenated user responses
     gpt4_response = gpt4.gpt4_call(user_gpt4_responses)
@@ -168,7 +201,50 @@ def run_gpt4():
 
     conn.commit()
 
-    return jsonify({'gpt4_response': gpt4_response})
+    process_gpt4_response()
+
+    conn = sqlite3.connect('charValues.db')
+    cursor = conn.cursor()
+
+    # Retrieve the values for 'health', 'food', and 'water' keys
+    cursor.execute("SELECT value FROM char_values WHERE name IN ('health', 'food', 'water')")
+    results = cursor.fetchall()
+
+    # Close the database connection
+    conn.close()
+
+    # Store the values in variables
+    health_value, food_value, water_value = [result[0] for result in results]
+
+    return jsonify({'gpt4_response': gpt4_response, 'health': health_value, 'food': food_value, 'water': water_value})
+
+def process_gpt4_response():
+    conn = sqlite3.connect('responses.db')
+    cursor = conn.cursor()
+
+    # Retrieve the final gpt4_response from the gpt4_responses table
+    cursor.execute("SELECT gpt4_response FROM gpt4_responses ORDER BY id DESC LIMIT 1")
+    result = cursor.fetchone()
+
+    # Close the database connection
+    conn.close()
+
+    # Check if result is not None
+    if result is not None:
+        response = result[0]
+        # Extract the values using regular expressions
+        import re
+
+        loss_match = re.search(r"Loss: -(\d+) health, -(\d+) food, -(\d+) water", response)
+        gain_match = re.search(r"Gain: (\d+) health, (\d+) food, (\d+) water", response)
+
+        if loss_match:
+            loss_health, loss_food, loss_water = map(int, loss_match.groups())
+            change_char_values(loss_health, loss_food, loss_water)
+
+        elif gain_match:
+            gain_health, gain_food, gain_water = map(int, gain_match.groups())
+            change_char_values(gain_health, gain_food, gain_water)
 
 # Initialize the database on startup
 initialize_char_database()

@@ -10,7 +10,5 @@ def snap():
     if ret:
         # Save the captured frame as an image file
         cv2.imwrite("captured_image.jpg", frame)
-        print("Image captured successfully")
-
     # Release the camera
     camera.release()

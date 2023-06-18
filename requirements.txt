@@ -4,3 +4,4 @@ imgurpython
 waitress
 flask
 openai
+cv2

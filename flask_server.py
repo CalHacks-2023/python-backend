@@ -4,7 +4,6 @@ from waitress import serve
 import gpt4
 import take_pic
 import run_hume
-import asyncio
 import openai
 
 app = Flask(__name__)
@@ -171,7 +170,7 @@ def generate_image():
 @app.route('/inputExpression', methods=['GET'])
 def run_gpt4():
     take_pic.snap()
-    user_emotion = asyncio.run(run_hume.detect_sentiment())
+    user_emotion = run_hume.detect_sentiment()
     
     conn = sqlite3.connect('responses.db')
     cursor = conn.cursor()

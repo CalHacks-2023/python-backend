@@ -135,8 +135,6 @@ def run_gpt4():
     conn = sqlite3.connect('responses.db')
     cursor = conn.cursor()
 
-    cursor.execute('''DELETE FROM user_responses WHERE id = (SELECT MIN(id) FROM user_responses)''')
-
     # Insert the user response into the 'user_responses' table
     cursor.execute('INSERT INTO user_responses (user_emotion) VALUES (?)', (user_emotion,))
     conn.commit()

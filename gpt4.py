@@ -4,7 +4,7 @@ import requests
 
 def gpt4_call(prompt):
     url = 'https://api.openai.com/v1/chat/completions'
-    api_key = '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'
+    api_key = 'YOUR_OPENAI_API_KEY_HERE'
 
     headers = {
         'Content-Type': 'application/json',

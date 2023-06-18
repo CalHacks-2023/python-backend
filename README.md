@@ -1,8 +1,22 @@
 Class “flask_server.py”
 
-Install python requirements with pip3 install -r requirements.txt
+1. Install python requirements with pip3 install -r requirements.txt
 
-All responses are JSON. Please first do the post request for http://localhost:8081/characterInit with the values you select, then, the http://localhost:8081/getInitialResponse get request, then the http://localhost:8081/inputExpression get request.
+2. To Run the Server:
+python3 flask_server.py
+
+3. Run Initial Queries: All responses are JSON. Please first do the post request for http://localhost:8081/characterInit with the values you select, then, the http://localhost:8081/getInitialResponse get request, then the http://localhost:8081/inputExpression get request.
+
+NOTE : If you get this ERROR:  NotOpenSSLWarning: urllib3 v2.0 only supports OpenSSL 1.1.1+
+run
+pip3 install urllib3==1.26.6
+
+Example characterInit POST
+{
+  "name" : "YOUR_NAME",
+  "biome" : "easy",
+  "difficulty" : "medium",
+}
 
 GET Requests
 
@@ -14,7 +28,7 @@ What it returns: {'gpt4_response': gpt4_response}
 
 http://localhost:8081/getCharValues
 Why use it?
-If you want to return values, health, food, water. 
+If you want to return values, health, food, water.
 
 What it returns: {“health”: 100, “food”: 110, “water”: 105}
 
@@ -59,4 +73,4 @@ Connects to the GPT-4 API, adds a prompt describing the image and generates an o
 Class “gpt4.py”
 Connects to the GPT-4 API.
 
-Constrains: do not run the code more than 
+Constrains: do not run the code more than

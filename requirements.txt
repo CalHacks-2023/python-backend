@@ -1,0 +1,6 @@
+hume
+hume[stream]
+imgurpython
+waitress
+flask
+openai

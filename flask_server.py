@@ -83,16 +83,18 @@ def initialize_responses_database():
 
     return gpt4_response
 
-def change_char_values(health_change, water_change, food_change):
+def change_char_values(health_change, water_change, food_change, loss_or_gain):
     conn = sqlite3.connect('charValues.db')
     cursor = conn.cursor()
 
-    cursor.execute("UPDATE char_values SET value = value + ? WHERE name = 'health'", (health_change,))
-
-    cursor.execute("UPDATE char_values SET value = value + ? WHERE name = 'food'", (water_change,))
-
-    cursor.execute("UPDATE char_values SET value = value + ? WHERE name = 'water'", (food_change,))
-
+    if loss_or_gain == "gain":
+        cursor.execute("UPDATE char_values SET value = value + ? WHERE name = 'health'", (health_change,))
+        cursor.execute("UPDATE char_values SET value = value + ? WHERE name = 'food'", (water_change,))
+        cursor.execute("UPDATE char_values SET value = value + ? WHERE name = 'water'", (food_change,))
+    elif loss_or_gain == "loss":
+        cursor.execute("UPDATE char_values SET value = value - ? WHERE name = 'health'", (health_change,))
+        cursor.execute("UPDATE char_values SET value = value - ? WHERE name = 'food'", (water_change,))
+        cursor.execute("UPDATE char_values SET value = value - ? WHERE name = 'water'", (food_change,))
     # Commit the changes
     conn.commit()
 
@@ -242,11 +244,11 @@ def process_gpt4_response():
 
         if loss_match:
             loss_health, loss_food, loss_water = map(int, loss_match.groups())
-            change_char_values(loss_health, loss_food, loss_water)
+            change_char_values(loss_health, loss_food, loss_water, "loss")
 
         elif gain_match:
             gain_health, gain_food, gain_water = map(int, gain_match.groups())
-            change_char_values(gain_health, gain_food, gain_water)
+            change_char_values(gain_health, gain_food, gain_water, "gain")
 
 # Initialize the database on startup
 initialize_char_database()

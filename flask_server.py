@@ -4,6 +4,7 @@ from waitress import serve
 import gpt4
 import take_pic
 import run_hume
+import asyncio
 
 app = Flask(__name__)
 
@@ -130,7 +131,8 @@ def get_stats_values():
 
 @app.route('/inputExpression', methods=['GET'])
 def run_gpt4():
-    user_emotion = take_and_process_picture()
+    take_pic.snap()
+    user_emotion = asyncio.run(run_hume.detect_sentiment())
     
     conn = sqlite3.connect('responses.db')
     cursor = conn.cursor()
@@ -167,12 +169,6 @@ def run_gpt4():
     conn.commit()
 
     return jsonify({'gpt4_response': gpt4_response})
-
-def take_and_process_picture():
-    take_pic.snap()
-    detected_sentiment = run_hume.detect_sentiment()
-    
-    return detected_sentiment
 
 # Initialize the database on startup
 initialize_char_database()

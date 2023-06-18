@@ -19,6 +19,7 @@ async def detect_sentiment():
 
         # Extract the top 5 emotion names with the highest scores
         top_6_emotions = [emotion['name'] for emotion in sorted_emotions[:6]]
-        result = ', '.join(top_6_emotions)
-        pprint(result)
-        return result
+        user_emotion = ', '.join(top_6_emotions)
+        print("HUGE", user_emotion)
+
+        return user_emotion

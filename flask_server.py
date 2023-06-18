@@ -81,6 +81,8 @@ def initialize_responses_database():
     conn.commit()
     conn.close()
 
+    return gpt4_response
+
 def change_char_values(health_change, water_change, food_change):
     conn = sqlite3.connect('charValues.db')
     cursor = conn.cursor()
@@ -249,7 +251,11 @@ def process_gpt4_response():
 # Initialize the database on startup
 initialize_char_database()
 initialize_stats_database()
-initialize_responses_database()
+
+@app.route('/getInitialResponse', methods=['GET'])
+def get_initial_response():
+    gpt4_response = initialize_responses_database()
+    return jsonify({'gpt4_response': gpt4_response})
 
 # Run the application using Waitress server
 serve(app, host='0.0.0.0', port=8081)

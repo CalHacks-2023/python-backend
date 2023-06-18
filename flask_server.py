@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify
 import sqlite3
 from waitress import serve
 import gpt4
+import testcv
+import run_hume
 
 app = Flask(__name__)
 
@@ -126,10 +128,10 @@ def get_stats_values():
 
     return jsonify(stats_values)
 
-@app.route('/inputExpression', methods=['POST'])
+@app.route('/inputExpression', methods=['GETT'])
 def run_gpt4():
-    user_emotion = request.json['user_emotion']
-
+    user_emotion = take_and_process_picture()
+    
     conn = sqlite3.connect('responses.db')
     cursor = conn.cursor()
 
@@ -167,6 +169,12 @@ def run_gpt4():
     conn.commit()
 
     return jsonify({'gpt4_response': gpt4_response})
+
+def take_and_process_picture():
+    testcv.take_pic()
+    detected_sentiment = run_hume.detect_sentiment("captured_image.png")
+    
+    return detected_sentiment
 
 # Initialize the database on startup
 initialize_char_database()

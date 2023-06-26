@@ -8,6 +8,11 @@ Run the Server:
 ```python
 python3 flask_server.py
 ```
+Add your OpenAI and Hume Keys in the .env.local file that you create:
+```
+OPENAI_API_KEY=your_key
+HUME_API_KEY=your_key
+```
 
 ### FIX ERROR: 
 ```NotOpenSSLWarning: urllib3 v2.0 only supports OpenSSL 1.1.1+```

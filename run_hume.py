@@ -17,7 +17,10 @@ def detect_sentiment():
     sorted_emotions = sorted(emotions, key=lambda x: x['score'], reverse=True)[:6]
 
     emotion_list = [emotion['name'] for emotion in sorted_emotions]
+    emotion_list = [emotion['name'] for emotion in sorted_emotions]
 
     joined_emotions = ', '.join(emotion_list)
+    joined_emotions = ', '.join(emotion_list)
 
+    return joined_emotions
     return joined_emotions

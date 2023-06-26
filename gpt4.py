@@ -5,7 +5,7 @@ env = dotenv_values(".env.local")
 
 def gpt4_call(prompt):
     url = 'https://api.openai.com/v1/chat/completions'
-    api_key = env["OPENAI_API_KEY"]
+    api_key = 'YOUR_OPENAI_API_KEY_HERE'
 
     headers = {
         'Content-Type': 'application/json',

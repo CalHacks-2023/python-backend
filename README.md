@@ -53,9 +53,6 @@ http://localhost:8081/inputExpression
 ```
 Returns: ```{“gpt4_response”: This is response …, “health”: 100, “food”: 95, “water”: 110}```
 
-### Delete All Databases and Images
-http://localhost:8081/deleteAll
-
 ### In Process - Deprecated
 ```sql
 http://localhost:8081/getStatsValues

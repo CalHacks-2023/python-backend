@@ -1,4 +1,4 @@
-# Class ```flask_server.py```
+# ```flask_server.py```
 
 Install python requirements:
 ```python
@@ -8,15 +8,21 @@ Run the Server:
 ```python
 python3 flask_server.py
 ```
----
 
-## Run Initial Queries. 
-Run ```http://localhost:8081/characterInit``` with the values you select. Now run ```http://localhost:8081/getInitialResponse``` get request, and finally execute ```http://localhost:8081/inputExpression``` get request. All responses are JSON.
-
-### FIX ERROR: ```NotOpenSSLWarning: urllib3 v2.0 only supports OpenSSL 1.1.1+```
+### FIX ERROR: 
+```NotOpenSSLWarning: urllib3 v2.0 only supports OpenSSL 1.1.1+```
 ```python
 pip3 install urllib3==1.26.6
 ```
+
+\
+&nbsp;
+
+---
+
+
+## Run Initial Queries. 
+Do a POST request ```http://localhost:8081/characterInit``` with the values you select.
 
 ```python
 Example characterInit POST
@@ -27,13 +33,26 @@ Example characterInit POST
 }
 ```
 
+Now run ```http://localhost:8081/getInitialResponse```
+
+Finally, execute ```http://localhost:8081/inputExpression``` get request. 
+
+All responses are JSON.
+
+IMPORTANT: When you finish running the program, you must do a GET request to http://localhost:8081/deleteAll to delete the databases and the images you have taken.
+
+\
+&nbsp;
+
+---
+
 ## GET Requests
 
 ### Run this Request Initially - Wait 20 seconds
 ```sql
 http://localhost:8081/getInitialResponse
 ```
-Returns: ```{'gpt4_response': gpt4_response}```
+Returns: ```{'gpt4_response': This is response …, “health”: 100, “food”: 95, “water”: 110}```
 
 ### Return Values
 ```sql
@@ -61,12 +80,18 @@ Returns: ```{“gpt4_response”: This is response …, “health”: 100, “fo
 ```sql
 http://localhost:8081/deleteAll
 ```
+Returns: ```{"Status”: 200}```
 
 ### In Process - Deprecated
 ```sql
 http://localhost:8081/getStatsValues
 ```
 Returns: ```N/A```
+
+\
+&nbsp;
+
+---
 
 
 ## POST Requests
@@ -80,6 +105,11 @@ http://localhost:8081/characterInit
 “name”: Adrian Bao, “biome”: desert, “difficulty”: medium
 ```
 Returns: ```Data inserted successfully```
+
+\
+&nbsp;
+
+---
 
 ## Other Classes
 

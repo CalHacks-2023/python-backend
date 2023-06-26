@@ -1,7 +1,9 @@
+pycamera
 hume
 hume[stream]
 imgurpython
 waitress
 flask
 openai
-opencv-python
+sqlite3
+python-dotenv

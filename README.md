@@ -44,6 +44,10 @@ Returns: ```{“health”: 100, “food”: 110, “water”: 105}```
 ### Generates Sprite
 Hardcoded to desert. It is recommended to use desert as of now.
 
+```sql
+http://localhost:8081/generateSprite
+```
+
 Returns: ```{“img_url”: http://link-to-generated-image.com}```
 
 ### Take Photo
@@ -52,6 +56,11 @@ Do a GET request whenever you want your computer to capture from the camera and 
 http://localhost:8081/inputExpression
 ```
 Returns: ```{“gpt4_response”: This is response …, “health”: 100, “food”: 95, “water”: 110}```
+
+### Delete All Databases and Images
+```sql
+http://localhost:8081/deleteAll
+```
 
 ### In Process - Deprecated
 ```sql

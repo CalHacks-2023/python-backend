@@ -4,8 +4,8 @@ from waitress import serve
 import gpt4
 import take_pic
 import run_hume
-import asyncio
 import openai
+import os
 
 app = Flask(__name__)
 
@@ -152,7 +152,7 @@ def get_stats_values():
 
 @app.route('/generateSprite', methods=['GET'])
 def generate_image():
-    openai.api_key = "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"
+    openai.api_key = "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"
 
     # The text prompt you want to use to generate an image
     prompt = "Brave fighting cartoon character in desert"
@@ -171,7 +171,7 @@ def generate_image():
 @app.route('/inputExpression', methods=['GET'])
 def run_gpt4():
     take_pic.snap()
-    user_emotion = asyncio.run(run_hume.detect_sentiment())
+    user_emotion = run_hume.detect_sentiment()
     
     conn = sqlite3.connect('responses.db')
     cursor = conn.cursor()
@@ -217,6 +217,7 @@ def run_gpt4():
     # Close the database connection
     conn.close()
 
+    print(results)
     # Store the values in variables
     health_value, food_value, water_value = [result[0] for result in results]
 
@@ -259,5 +260,34 @@ def get_initial_response():
     gpt4_response = initialize_responses_database()
     return jsonify({'gpt4_response': gpt4_response})
 
+@app.route('/deleteAll', methods=['GET'])
+def clear_info():
+    try:
+        os.remove("charValues.db")
+    except:
+        print("charValues.db does not exist.")
+
+    try:
+        os.remove("initValues.db")
+    except:
+        print("initValues.db does not exist.")
+
+    try:    
+        os.remove("responses.db")
+    except:
+        print("responses.db does not exist.")
+
+    try:
+        os.remove("statsValues.db")
+    except:
+        print("statsValues.db does not exist.")
+
+    try:
+        os.remove("captured_image.jpg")
+    except:
+        print("captured_image.jpg does not exist.")
+
+    return jsonify({"Status": 200})
+    
 # Run the application using Waitress server
 serve(app, host='0.0.0.0', port=8081)

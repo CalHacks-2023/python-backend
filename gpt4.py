@@ -1,10 +1,11 @@
-import os
-import openai
 import requests
+from dotenv import dotenv_values
+
+env = dotenv_values(".env.local")
 
 def gpt4_call(prompt):
     url = 'https://api.openai.com/v1/chat/completions'
-    api_key = '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'
+    api_key = env["OPENAI_API_KEY"]
 
     headers = {
         'Content-Type': 'application/json',
@@ -20,6 +21,7 @@ def gpt4_call(prompt):
     response = requests.post(url, headers=headers, json=payload)
 
     data = response.json()
+    print(data)
 
     reply = data['choices'][0]['message']['content']
 

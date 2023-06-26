@@ -1,62 +1,86 @@
-Class “flask_server.py”
+# Class ```flask_server.py```
 
-Install python requirements with pip3 install -r requirements.txt
+Install python requirements:
+```python
+pip3 install -r requirements.txt
+```
+Run the Server: 
+```python
+python3 flask_server.py
+```
+---
 
-All responses are JSON. Please first do the post request for http://localhost:8081/characterInit with the values you select, then, the http://localhost:8081/getInitialResponse get request, then the http://localhost:8081/inputExpression get request.
+## Run Initial Queries. 
+Run ```http://localhost:8081/characterInit``` with the values you select. Now run ```http://localhost:8081/getInitialResponse``` get request, and finally execute ```http://localhost:8081/inputExpression``` get request. All responses are JSON.
 
-GET Requests
+### FIX ERROR: ```NotOpenSSLWarning: urllib3 v2.0 only supports OpenSSL 1.1.1+```
+```python
+pip3 install urllib3==1.26.6
+```
 
+```python
+Example characterInit POST
+{
+  "name" : "YOUR_NAME",
+  "biome" : "easy",
+  "difficulty" : "medium",
+}
+```
+
+## GET Requests
+
+### Run this Request Initially - Wait 20 seconds
+```sql
 http://localhost:8081/getInitialResponse
-Why use it?
-Run this request initially after 20 seconds. This will give the user the prompt.
+```
+Returns: ```{'gpt4_response': gpt4_response}```
 
-What it returns: {'gpt4_response': gpt4_response}
-
+### Return Values
+```sql
 http://localhost:8081/getCharValues
-Why use it?
-If you want to return values, health, food, water. 
+```
+Returns: ```{“health”: 100, “food”: 110, “water”: 105}```
 
-What it returns: {“health”: 100, “food”: 110, “water”: 105}
+### Generates Sprite
+Hardcoded to desert. It is recommended to use desert as of now.
 
-http://localhost:8081/getStatsValues
-Why use it?
-Don’t use. Not implemented.
+Returns: ```{“img_url”: http://link-to-generated-image.com}```
 
-What it returns: N/A
-
-Why use it?
-Generates sprite. Hardcoded to desert, recommend using desert option no matter what you do.
-
-What it returns: {“img_url”: http://link-to-generated-image.com}
-
+### Take Photo
+Do a GET request whenever you want your computer to capture from the camera and this will return ```gpt4_response```, ```health```, ```food```, and ```water``` values. Do this at most 3 times for demonstration purposes since the Hume API can crash out.
+```sql
 http://localhost:8081/inputExpression
-Why use it?
-Do a GET request whenever you want your computer to capture from the camera and this will return gpt4_response, health, food, and water values. Do this at most 3 times for demonstration purposes since APIs we are using can crash out.
+```
+Returns: ```{“gpt4_response”: This is response …, “health”: 100, “food”: 95, “water”: 110}```
 
-What it returns: {“gpt4_response”: This is response …, “health”: 100, “food”: 95, “water”: 110}
+### Delete All Databases and Images
+http://localhost:8081/deleteAll
 
-POST Requests
+### In Process - Deprecated
+```sql
+http://localhost:8081/getStatsValues
+```
+Returns: ```N/A```
 
+
+## POST Requests
+### Use at Start
+```sql
 http://localhost:8081/characterInit
-Why use it?
-Use once when you start
+```
 
-Required input:
-Input with “name”: Adrian Bao, “biome”: desert, “difficulty”: medium
+### Required Input
+```sql
+“name”: Adrian Bao, “biome”: desert, “difficulty”: medium
+```
+Returns: ```Data inserted successfully```
 
-What it returns:
-'Data inserted successfully'
+## Other Classes
 
-Class “take_pic.py”
-If an instance of a face is detected via camera, OpenCV will take a photo which will be saved under the name “captured_image.jpg”. A new picture will be taken every time the user creates a new request.
+- ```take_pic.py``` creates an instance of picture if a face is detected via OpenCV. The camera will save the file under the name ```captured_image.jpg```. A new picture will be taken every time the user creates a new request - preferably every five seconds.
 
-Class “run_hume.py”
-Connects the “captured_image.jpg” to the Hume API. The API will detect the top 6 emotions in that image and will rate them with an integer value that will then be used in the “flask_server.py” class to either increase or decrease the values of health, water, food, etc. This could be visualized in the front-end.
+- ```run_hume.py``` connects the ```captured_image.jpg``` to the Hume API. The API will detect the top 6 emotions in that image and will rate them with an integer value that will then be used in the ```flask_server.py``` class to either increase or decrease the values of ```health```, ```water```, ```food```, etc. These stats can then be visualized in the user interface.
 
-Class “dalle-img-generator.py”
-Connects to the GPT-4 API, adds a prompt describing the image and generates an output of dimension 1024x1024. This will output a url pointing to the image. If we have enough time, we can display this in the front-end.
+- ```dalle-img-generator.py``` connects to the GPT-4 API, adds a prompt describing the image and generates an output of dimensions 1024x1024. The output creates a url pointing to the generated image.
 
-Class “gpt4.py”
-Connects to the GPT-4 API.
-
-Constrains: do not run the code more than 
+- ```gpt4.py``` connects to the GPT-4 API.
